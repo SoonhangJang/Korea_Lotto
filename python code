@@ -1,0 +1,36 @@
+import requests
+import random
+
+def get_lotto_numbers(episode):
+    params = {
+        'method': 'getLottoNumber',
+        'drwNo': episode
+    }
+
+    request = requests.get('https://dhlottery.co.kr/common.do',
+                           params=params)
+    response = request.json() 
+
+    num_arr = []
+    for i in range(1,7):
+        num_arr.append(response["drwtNo" + str(i)])
+    return num_arr
+
+old_lotto_numbers = []
+my_lotto_numbers = []
+
+for i in range(1, 964):                                                 ## 964 is the most recent number of lotto episodes
+    old_lotto_numbers.append(get_lotto_numbers(i))
+
+while len(my_lotto_numbers) < 5:                                        ## 5 is the number of chances, if you want to get more parings of number, change it
+    list_of_numbers = list(range(1,46))
+    random.shuffle(list_of_numbers)
+    numbers = list_of_numbers[:6]
+
+    if numbers not in old_lotto_numbers or numbers not in my_lotto_numbers:
+        my_lotto_numbers.append(numbers)
+
+f = open("number.txt", 'w')
+for nums in my_lotto_numbers:
+    f.write(str(sorted(nums)) + "\n")
+f.close()
